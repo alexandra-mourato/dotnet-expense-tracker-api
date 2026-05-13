@@ -44,13 +44,13 @@ src/
 ### Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/expense-tracker-api.git
+git clone https://github.com/alexandra-mourato/dotnet-expense-tracker-api.git
 ```
 
 ### Navigate to the project
 
 ```bash
-cd expense-tracker-api
+cd dotnet-expense-tracker-api
 ```
 
 ### Restore dependencies
@@ -82,6 +82,10 @@ After running the application, open:
 ```text
 http://localhost:5179/swagger
 ```
+
+### Swagger UI
+
+![Swagger Screenshot](./assets/swagger.png)
 
 ---
 
@@ -167,3 +171,7 @@ Examples:
 - PostgreSQL support
 
 ---
+
+## License
+
+This project is licensed under the MIT License.
