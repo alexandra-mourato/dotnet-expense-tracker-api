@@ -1,4 +1,4 @@
-﻿namespace ExpenseTracker.Application.Dtos;
+﻿namespace ExpenseTracker.Application.Dtos.Input;
 
 public class CreateExpenseDto
 {

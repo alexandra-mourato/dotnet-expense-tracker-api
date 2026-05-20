@@ -1,4 +1,5 @@
 ﻿using ExpenseTracker.Application.Dtos;
+using ExpenseTracker.Application.Dtos.Input;
 using FluentValidation;
 
 namespace ExpenseTracker.Application.Validators;

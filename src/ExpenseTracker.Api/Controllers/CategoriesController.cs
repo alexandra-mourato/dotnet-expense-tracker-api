@@ -1,4 +1,5 @@
-﻿using ExpenseTracker.Application.Dtos;
+﻿using ExpenseTracker.Api.Filters;
+using ExpenseTracker.Application.Dtos;
 using ExpenseTracker.Domain.Entities;
 using ExpenseTracker.Infrastructure.Data;
 using FluentValidation;
@@ -57,6 +58,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
+    [ServiceFilter(typeof(ValidationFilter<CreateCategoryDto>))]
     public async Task<ActionResult<CategoryDto>> Create(CreateCategoryDto dto)
     {
         var validationResult = await _validator.ValidateAsync(dto);

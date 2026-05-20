@@ -1,4 +1,6 @@
-﻿using ExpenseTracker.Application.Dtos;
+﻿using ExpenseTracker.Api.Filters;
+using ExpenseTracker.Application.Dtos;
+using ExpenseTracker.Application.Dtos.Input;
 using ExpenseTracker.Domain.Entities;
 using ExpenseTracker.Infrastructure.Data;
 using FluentValidation;
@@ -23,26 +25,30 @@ public class ExpensesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ExpenseDto>>> GetAll(
-        [FromQuery] int? month,
-        [FromQuery] int? year)
+    [ServiceFilter(typeof(ValidationFilter<GetExpensesInputDto>))]
+    public async Task<ActionResult<PagedResultDto<ExpenseDto>>> GetAll(
+        [FromQuery] GetExpensesInputDto inputDto)
     {
         var query = _context.Expenses
             .AsNoTracking()
             .AsQueryable();
 
-        if (month.HasValue)
+        if (inputDto.Month.HasValue)
         {
-            query = query.Where(e => e.Date.Month == month.Value);
+            query = query.Where(e => e.Date.Month == inputDto.Month.Value);
         }
 
-        if (year.HasValue)
+        if (inputDto.Year.HasValue)
         {
-            query = query.Where(e => e.Date.Year == year.Value);
+            query = query.Where(e => e.Date.Year == inputDto.Year.Value);
         }
+
+        var totalItems = await query.CountAsync();
 
         var expenses = await query
             .OrderByDescending(e => e.Date)
+            .Skip((inputDto.PageNumber - 1) * inputDto.PageSize)
+            .Take(inputDto.PageSize)
             .Select(e => new ExpenseDto
             {
                 Id = e.Id,
@@ -54,7 +60,16 @@ public class ExpensesController : ControllerBase
             })
             .ToListAsync();
 
-        return Ok(expenses);
+        var result = new PagedResultDto<ExpenseDto>
+        {
+            Items = expenses,
+            PageNumber = inputDto.PageNumber,
+            PageSize = inputDto.PageSize,
+            TotalItems = totalItems,
+            TotalPages = (int)Math.Ceiling(totalItems / (double)inputDto.PageSize)
+        };
+
+        return Ok(result);
     }
     
     [HttpGet("{id:guid}")]
@@ -83,19 +98,14 @@ public class ExpensesController : ControllerBase
     }
 
     [HttpPost]
+    [ServiceFilter(typeof(ValidationFilter<CreateExpenseDto>))]
     public async Task<ActionResult<ExpenseDto>> Create(CreateExpenseDto dto)
     {
-        var validationResult = await _validator.ValidateAsync(dto);
+        var category = await _context.Categories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == dto.CategoryId);
 
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
-        
-        var categoryExists = await _context.Categories
-            .AnyAsync(c => c.Id == dto.CategoryId);
-
-        if (!categoryExists)
+        if (category is null)
         {
             return BadRequest("Category does not exist.");
         }
@@ -111,9 +121,6 @@ public class ExpensesController : ControllerBase
         _context.Expenses.Add(expense);
 
         await _context.SaveChangesAsync();
-
-        var category = await _context.Categories
-            .FirstAsync(c => c.Id == dto.CategoryId);
 
         var result = new ExpenseDto
         {

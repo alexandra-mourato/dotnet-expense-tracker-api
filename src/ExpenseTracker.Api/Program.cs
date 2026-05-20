@@ -1,6 +1,9 @@
 using ExpenseTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using ExpenseTracker.Api.Filters;
+using ExpenseTracker.Application.Dtos;
+using ExpenseTracker.Application.Dtos.Input;
 using ExpenseTracker.Application.Validators;
 using FluentValidation;
 
@@ -19,8 +22,11 @@ builder.Services.AddDbContext<ExpenseTrackerDbContext>(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryDtoValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateExpenseDtoValidator>();
+
+// Validators
+builder.Services.AddScoped<ValidationFilter<CreateExpenseDto>>();
+builder.Services.AddScoped<ValidationFilter<CreateCategoryDto>>();
+builder.Services.AddScoped<ValidationFilter<GetExpensesInputDto>>();
 
 var app = builder.Build();
 
