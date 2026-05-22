@@ -67,6 +67,13 @@ dotnet ef database update \
 --startup-project src/ExpenseTracker.Api
 ```
 
+### Create migrations
+```bash
+dotnet ef migrations add [name]  
+--project ExpenseTracker.Infrastructure 
+--startup-project ExpenseTracker.Api
+```
+
 ### Run the API
 
 ```bash

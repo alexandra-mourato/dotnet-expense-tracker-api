@@ -11,7 +11,7 @@ public class CreateExpenseDtoValidatorTests
     [Fact]
     public void Should_Pass_When_Dto_Is_Valid()
     {
-        var dto = new CreateExpenseDto
+        var dto = new CreateExpenseInputDto
         {
             Description = "Lunch",
             Amount = 12.50m,
@@ -29,7 +29,7 @@ public class CreateExpenseDtoValidatorTests
     [InlineData("")]
     public void Should_Fail_When_Description_Is_Invalid(string description)
     {
-        var dto = new CreateExpenseDto
+        var dto = new CreateExpenseInputDto
         {
             Description = description,
             Amount = 10m,
@@ -47,7 +47,7 @@ public class CreateExpenseDtoValidatorTests
     [InlineData(-5)]
     public void Should_Fail_When_Amount_Is_Less_Than_Or_Equal_To_Zero(decimal amount)
     {
-        var dto = new CreateExpenseDto
+        var dto = new CreateExpenseInputDto
         {
             Description = "Coffee",
             Amount = amount,
@@ -63,7 +63,7 @@ public class CreateExpenseDtoValidatorTests
     [Fact]
     public void Should_Fail_When_CategoryId_Is_Empty()
     {
-        var dto = new CreateExpenseDto
+        var dto = new CreateExpenseInputDto
         {
             Description = "Coffee",
             Amount = 2m,
