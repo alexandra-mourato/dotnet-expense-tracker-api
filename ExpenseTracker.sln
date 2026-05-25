@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseTracker.Domain", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseTracker.Application.Tests", "test\ExpenseTracker.Application.Tests\ExpenseTracker.Application.Tests.csproj", "{2BC1FB02-642A-4FAF-97EC-47060C97F178}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseTracker.Api.Tests", "ExpenseTracker.Api.Tests\ExpenseTracker.Api.Tests.csproj", "{5AC85EAD-B49F-4DAA-9BCB-E240C681203E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{2BC1FB02-642A-4FAF-97EC-47060C97F178}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BC1FB02-642A-4FAF-97EC-47060C97F178}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BC1FB02-642A-4FAF-97EC-47060C97F178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AC85EAD-B49F-4DAA-9BCB-E240C681203E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AC85EAD-B49F-4DAA-9BCB-E240C681203E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AC85EAD-B49F-4DAA-9BCB-E240C681203E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AC85EAD-B49F-4DAA-9BCB-E240C681203E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
