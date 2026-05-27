@@ -1,9 +1,10 @@
-﻿using ExpenseTracker.Domain.Entities;
+﻿using ExpenseTracker.Application.Interfaces.Persistence;
+using ExpenseTracker.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Infrastructure.Data;
 
-public class ExpenseTrackerDbContext : DbContext
+public class ExpenseTrackerDbContext : DbContext, IExpenseTrackerDbContext
 {
     public ExpenseTrackerDbContext(DbContextOptions<ExpenseTrackerDbContext> options)
         : base(options)
@@ -12,6 +13,7 @@ public class ExpenseTrackerDbContext : DbContext
 
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Expense> Expenses => Set<Expense>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

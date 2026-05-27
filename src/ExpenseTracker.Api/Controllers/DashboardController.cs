@@ -1,61 +1,31 @@
-﻿using ExpenseTracker.Infrastructure.Data;
+﻿using ExpenseTracker.Application.Dtos.Output;
+using ExpenseTracker.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class DashboardController : ControllerBase
 {
-    private readonly ExpenseTrackerDbContext _context;
+    private readonly IDashboardService _dashboardService;
 
-    public DashboardController(ExpenseTrackerDbContext context)
+    public DashboardController(IDashboardService dashboardService)
     {
-        _context = context;
+        _dashboardService = dashboardService;
     }
 
     [HttpGet("monthly")]
-    public async Task<IActionResult> GetMonthlyDashboard(
+    public async Task<ActionResult<DashboardOutputDto>> GetMonthlyDashboard(
         [FromQuery] int month,
         [FromQuery] int year)
     {
-        var expenses = _context.Expenses
-            .AsNoTracking()
-            .Where(e => e.Date.Month == month && e.Date.Year == year);
+        var dashboard = await _dashboardService.GetMonthlyDashboardAsync(
+            month,
+            year);
 
-        var totalSpent = await expenses.SumAsync(e => e.Amount);
-
-        var totalByCategory = await expenses
-            .GroupBy(e => e.Category.Name)
-            .Select(g => new
-            {
-                Category = g.Key,
-                Total = g.Sum(e => e.Amount)
-            })
-            .OrderByDescending(x => x.Total)
-            .ToListAsync();
-
-        var latestExpenses = await expenses
-            .OrderByDescending(e => e.Date)
-            .Take(5)
-            .Select(e => new
-            {
-                e.Id,
-                e.Description,
-                e.Amount,
-                e.Date,
-                CategoryName = e.Category.Name
-            })
-            .ToListAsync();
-
-        return Ok(new
-        {
-            Month = month,
-            Year = year,
-            TotalSpent = totalSpent,
-            TotalByCategory = totalByCategory,
-            LatestExpenses = latestExpenses
-        });
+        return Ok(dashboard);
     }
 }

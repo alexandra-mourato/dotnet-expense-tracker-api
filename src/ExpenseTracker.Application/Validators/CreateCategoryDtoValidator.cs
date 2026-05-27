@@ -1,9 +1,9 @@
-﻿using ExpenseTracker.Application.Dtos;
+﻿using ExpenseTracker.Application.Dtos.Input;
 using FluentValidation;
 
 namespace ExpenseTracker.Application.Validators;
 
-public class CreateCategoryDtoValidator : AbstractValidator<CreateCategoryDto>
+public class CreateCategoryDtoValidator : AbstractValidator<CreateCategoryInputDto>
 {
     public CreateCategoryDtoValidator()
     {

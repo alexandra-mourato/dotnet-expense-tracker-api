@@ -1,53 +1,35 @@
-﻿using ExpenseTracker.Api.Filters;
-using ExpenseTracker.Application.Dtos;
-using ExpenseTracker.Domain.Entities;
-using ExpenseTracker.Infrastructure.Data;
-using FluentValidation;
+﻿using ExpenseTracker.Application.Dtos;
+using ExpenseTracker.Application.Dtos.Input;
+using ExpenseTracker.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CategoriesController : ControllerBase
 {
-    private readonly ExpenseTrackerDbContext _context;
-    private readonly IValidator<CreateCategoryDto> _validator;
+    private readonly ICategoryService _categoryService;
 
-    public CategoriesController(ExpenseTrackerDbContext context, IValidator<CreateCategoryDto> validator)
+    public CategoriesController(ICategoryService categoryService)
     {
-        _context = context;
-        _validator = validator;
+        _categoryService = categoryService;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAll()
     {
-        var categories = await _context.Categories
-            .AsNoTracking()
-            .Select(c => new CategoryDto
-            {
-                Id = c.Id,
-                Name = c.Name
-            })
-            .ToListAsync();
+        var categories = await _categoryService.GetAllAsync();
 
         return Ok(categories);
     }
-    
+
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<CategoryDto>> GetById(Guid id)
     {
-        var category = await _context.Categories
-            .AsNoTracking()
-            .Where(c => c.Id == id)
-            .Select(c => new CategoryDto
-            {
-                Id = c.Id,
-                Name = c.Name
-            })
-            .FirstOrDefaultAsync();
+        var category = await _categoryService.GetByIdAsync(id);
 
         if (category is null)
         {
@@ -58,31 +40,13 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
-    [ServiceFilter(typeof(ValidationFilter<CreateCategoryDto>))]
-    public async Task<ActionResult<CategoryDto>> Create(CreateCategoryDto dto)
+    public async Task<ActionResult<CategoryDto>> Create(CreateCategoryInputDto input)
     {
-        var validationResult = await _validator.ValidateAsync(dto);
+        var category = await _categoryService.CreateAsync(input);
 
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
-        
-        var category = new Category
-        {
-            Name = dto.Name
-        };
-
-        _context.Categories.Add(category);
-
-        await _context.SaveChangesAsync();
-
-        var result = new CategoryDto
-        {
-            Id = category.Id,
-            Name = category.Name
-        };
-
-        return CreatedAtAction(nameof(GetById), new { id = category.Id }, result);
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = category.Id },
+            category);
     }
 }

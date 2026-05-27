@@ -4,39 +4,48 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ExpenseTracker.Api.Filters;
 
-public class ValidationFilter<T> : IAsyncActionFilter
-    where T : class
+public class ValidationFilter : IAsyncActionFilter
 {
-    private readonly IValidator<T> _validator;
+    private readonly IServiceProvider _serviceProvider;
 
-    public ValidationFilter(IValidator<T> validator)
+    public ValidationFilter(IServiceProvider serviceProvider)
     {
-        _validator = validator;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task OnActionExecutionAsync(
         ActionExecutingContext context,
         ActionExecutionDelegate next)
     {
-        var argument = context.ActionArguments
-            .Values
-            .OfType<T>()
-            .FirstOrDefault();
-
-        if (argument is null)
+        foreach (var argument in context.ActionArguments.Values)
         {
-            await next();
-            return;
-        }
+            if (argument is null)
+            {
+                continue;
+            }
 
-        var validationResult = await _validator.ValidateAsync(argument);
+            var validatorType = typeof(IValidator<>)
+                .MakeGenericType(argument.GetType());
 
-        if (!validationResult.IsValid)
-        {
-            context.Result = new BadRequestObjectResult(
-                validationResult.Errors);
+            var validator = _serviceProvider.GetService(validatorType);
 
-            return;
+            if (validator is null)
+            {
+                continue;
+            }
+
+            var validationContext = new ValidationContext<object>(argument);
+
+            var validationResult = await ((IValidator)validator)
+                .ValidateAsync(validationContext);
+
+            if (!validationResult.IsValid)
+            {
+                context.Result = new BadRequestObjectResult(
+                    validationResult.Errors);
+
+                return;
+            }
         }
 
         await next();
