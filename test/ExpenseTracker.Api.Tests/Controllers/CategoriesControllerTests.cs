@@ -1,23 +1,20 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 
-namespace ExpenseTracker.Api.Tests;
+namespace ExpenseTracker.Api.Tests.Controllers;
 
-public class CategoriesControllerTests : IClassFixture<CustomWebApplicationFactory>
+public class CategoriesControllerTests : TestBase, IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly HttpClient _client;
-
-    public CategoriesControllerTests(CustomWebApplicationFactory factory)
+    public CategoriesControllerTests(CustomWebApplicationFactory factory) : base(factory.CreateClient())
     {
-        _client = factory.CreateClient();
     }
-
+    
     [Fact]
     public async Task Create_Should_Return_Created_When_Request_Is_Valid()
     {
         var request = new { Name = "Food" };
 
-        var response = await _client.PostAsJsonAsync("/api/categories", request);
+        var response = await Client.PostAsJsonAsync("/api/categories", request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
@@ -25,7 +22,7 @@ public class CategoriesControllerTests : IClassFixture<CustomWebApplicationFacto
     [Fact]
     public async Task GetAll_Should_Return_Ok()
     {
-        var response = await _client.GetAsync("/api/categories");
+        var response = await Client.GetAsync("/api/categories");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -35,7 +32,7 @@ public class CategoriesControllerTests : IClassFixture<CustomWebApplicationFacto
     {
         var request = new { Name = "" };
 
-        var response = await _client.PostAsJsonAsync("/api/categories", request);
+        var response = await Client.PostAsJsonAsync("/api/categories", request);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }

@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 
-namespace ExpenseTracker.Api.Tests;
+namespace ExpenseTracker.Api.Tests.Controllers;
 
 public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
 {

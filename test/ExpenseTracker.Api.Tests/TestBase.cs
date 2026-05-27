@@ -10,6 +10,10 @@ public abstract class TestBase
     protected TestBase(HttpClient client)
     {
         Client = client;
+        
+        AuthenticateAsync()
+            .GetAwaiter()
+            .GetResult();
     }
 
     protected async Task AuthenticateAsync()

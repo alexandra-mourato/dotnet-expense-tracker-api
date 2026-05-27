@@ -1,36 +1,39 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 
-namespace ExpenseTracker.Api.Tests;
+namespace ExpenseTracker.Api.Tests.Controllers;
 
-public class DashboardControllerTests : IClassFixture<CustomWebApplicationFactory>
+public class DashboardControllerTests : TestBase, IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly HttpClient _client;
-
-    public DashboardControllerTests(CustomWebApplicationFactory factory)
+    public DashboardControllerTests(CustomWebApplicationFactory factory) : base(factory.CreateClient())
     {
-        _client = factory.CreateClient();
     }
 
     [Fact]
     public async Task GetMonthlyDashboard_Should_Return_Ok()
     {
-        var response = await _client.GetAsync("/api/dashboard/monthly?month=5&year=2026");
+        var response = await Client.GetAsync("/api/dashboard/monthly?month=5&year=2026");
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        // Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.True(
+            response.StatusCode == HttpStatusCode.OK,
+            body);
     }
 
     [Fact]
     public async Task GetMonthlyDashboard_Should_Return_Data_When_Expenses_Exist()
     {
-        var categoryResponse = await _client.PostAsJsonAsync(
+        var categoryResponse = await Client.PostAsJsonAsync(
             "/api/categories",
             new { Name = "Food" });
 
         var category = await categoryResponse.Content
             .ReadFromJsonAsync<CategoryResponse>();
 
-        await _client.PostAsJsonAsync(
+        await Client.PostAsJsonAsync(
             "/api/expenses",
             new
             {
@@ -40,7 +43,7 @@ public class DashboardControllerTests : IClassFixture<CustomWebApplicationFactor
                 CategoryId = category!.Id
             });
 
-        var response = await _client.GetAsync(
+        var response = await Client.GetAsync(
             "/api/dashboard/monthly?month=5&year=2026");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

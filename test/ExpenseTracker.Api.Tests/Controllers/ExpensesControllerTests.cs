@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 
-namespace ExpenseTracker.Api.Tests;
+namespace ExpenseTracker.Api.Tests.Controllers;
 
 public class ExpensesControllerTests : TestBase, IClassFixture<CustomWebApplicationFactory>
 {
@@ -35,8 +35,6 @@ public class ExpensesControllerTests : TestBase, IClassFixture<CustomWebApplicat
     [Fact]
     public async Task GetAll_Should_Return_Ok()
     {
-        await AuthenticateAsync();
-        
         var response = await Client.GetAsync("/api/expenses?pageNumber=1&pageSize=10");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -45,8 +43,6 @@ public class ExpensesControllerTests : TestBase, IClassFixture<CustomWebApplicat
     [Fact]
     public async Task GetAll_Should_Return_BadRequest_When_PageNumber_Is_Invalid()
     {
-        await AuthenticateAsync();
-        
         var response = await Client.GetAsync("/api/expenses?pageNumber=0&pageSize=10");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
